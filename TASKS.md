@@ -87,9 +87,10 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"seed"`, ringkasan counts (developers/products/tags) `info`; tanpa PII asli.
   - Validasi: seed melewati skema Zod yang sama dengan produk (jadi data seed tidak "curang").
 - Checklist:
-  - [ ] Counts memenuhi §59–60; data jelas fiktif (bukan customer asli)
-  - [ ] Seed rerunnable tanpa duplikat
-  - [ ] Commit di `agent/seed-data`
+  - [x] Counts memenuhi §59–60; data jelas fiktif (bukan customer asli)
+  - [x] Seed rerunnable tanpa duplikat
+  - [x] Commit di `agent/seed-data`
+- Progres T03: seed.sql idempoten (10 dev, 24 produk 22 published+2 draft, 8 kategori, 32 tags, socials/versions/images/tags) + cover.svg + README seed. Validasi Zod di test (slug/https/counts/fiktif). QA: 18 test, typecheck, lint lolos.
 
 ### T04 — Auth (email/password + Google) + role guard server-side
 - Branch: `agent/auth-roles` | Dep: T02 | PRD: §49–51, §69
