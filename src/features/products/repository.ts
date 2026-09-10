@@ -50,6 +50,17 @@ export async function listDevelopers(supabase: SupabaseClient, limit = 6): Promi
   return (data ?? []) as unknown as Developer[];
 }
 
+export async function listOwnProducts(supabase: SupabaseClient, developerId: string): Promise<ProductWithRelations[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select(SELECT)
+    .eq("developer_id", developerId)
+    .order("updated_at", { ascending: false })
+    .limit(50);
+  if (error) throw toUpstream(error);
+  return (data ?? []) as unknown as ProductWithRelations[];
+}
+
 export async function getProductBySlug(supabase: SupabaseClient, slug: string): Promise<ProductWithRelations | null> {
   const { data, error } = await supabase.from("products").select(SELECT).eq("slug", slug).maybeSingle();
   if (error) throw toUpstream(error);

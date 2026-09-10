@@ -211,8 +211,9 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"developers"`, `info action:"profile_update"` (tanpa nilai kontak sensitif di log).
   - Validasi: Zod profil + kontak per-channel (format WA/telepon, email, https URL).
 - Checklist:
-  - [ ] Guard server-side; hanya kontak enabled yang tampil
-  - [ ] Commit di `agent/dashboard-shell`
+  - [x] Guard server-side; hanya kontak enabled yang tampil
+  - [x] Commit di `agent/dashboard-shell`
+- Progres T10: developers schema/service/repo profil+kontak, actions guard, layout guard + force-dynamic, overview/products/profile/contacts. QA: 41 test, typecheck, lint, build lolos.
 
 ### T11 — Wizard create/edit produk + upload
 - Branch: `agent/product-wizard` | Dep: T10 | PRD: §20–21, §53, §74

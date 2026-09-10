@@ -43,3 +43,41 @@ export function computeStats(products: Pick<ProductWithRelations, "verification_
     updatedRecently: products.filter((p) => new Date(p.updated_at).getTime() >= twoWeeksAgo).length,
   };
 }
+
+export interface OwnDeveloper extends Developer {
+  developers_socials?: { channel: string; value: string; enabled: boolean }[] | null;
+}
+
+/** Profil milik user login (bukan publik). */
+export async function getOwnDeveloper(supabase: SupabaseClient, profileId: string): Promise<OwnDeveloper | null> {
+  const { data, error } = await supabase
+    .from("developers")
+    .select("*, developers_socials(channel,value,enabled)")
+    .eq("profile_id", profileId)
+    .maybeSingle();
+  if (error) throw toUpstream(error);
+  return (data ?? null) as unknown as OwnDeveloper | null;
+}
+
+export async function updateDeveloper(
+  supabase: SupabaseClient,
+  developerId: string,
+  patch: { display_name: string; bio: string; website_url?: string; github_url?: string },
+): Promise<void> {
+  const { error } = await supabase.from("developers").update(patch).eq("id", developerId);
+  if (error) throw toUpstream(error);
+}
+
+export async function replaceSocials(
+  supabase: SupabaseClient,
+  developerId: string,
+  socials: { channel: string; value: string; enabled: boolean }[],
+): Promise<void> {
+  const { error: delError } = await supabase.from("developers_socials").delete().eq("developer_id", developerId);
+  if (delError) throw toUpstream(delError);
+  if (socials.length === 0) return;
+  const { error } = await supabase
+    .from("developers_socials")
+    .insert(socials.map((s) => ({ developer_id: developerId, ...s })));
+  if (error) throw toUpstream(error);
+}
