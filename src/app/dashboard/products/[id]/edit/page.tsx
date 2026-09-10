@@ -3,7 +3,7 @@ import { createServerSupabase } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
 import { getOwnDeveloper } from "@/features/developers/repository";
 import { getOwnProduct, listCategories } from "@/features/products/repository";
-import { updateDraftAction } from "@/features/products/actions";
+import { updateDraftAction, submitProductAction } from "@/features/products/actions";
 import { ProductWizard } from "@/features/products/components/ProductWizard";
 
 interface Props {
@@ -53,6 +53,23 @@ export default async function EditProductPage({ params }: Props) {
           submitLabel="Simpan perubahan"
         />
       </div>
+      {(product.status === "draft" || product.status === "rejected") && (
+        <form
+          className="mt-6 rounded-lg border border-zinc-200 p-4"
+          action={async () => {
+            "use server";
+            await submitProductAction(id);
+          }}
+        >
+          <h2 className="font-medium">Kirim untuk review</h2>
+          <p className="mt-1 text-sm text-zinc-600">
+            Data lengkap divalidasi + skor verifikasi dihitung. Admin mereview sebelum published.
+          </p>
+          <button type="submit" className="mt-3 rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white">
+            Kirim untuk review
+          </button>
+        </form>
+      )}
     </main>
   );
 }

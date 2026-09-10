@@ -185,3 +185,14 @@ export async function categoryExists(supabase: SupabaseClient, categoryId: strin
   if (error) throw toUpstream(error);
   return data !== null;
 }
+
+/** Ubah status + kolom verifikasi (dipakai submit developer & aksi admin). */
+export async function setProductStatus(
+  supabase: SupabaseClient,
+  productId: string,
+  status: string,
+  extra: Record<string, unknown> = {},
+): Promise<void> {
+  const { error } = await supabase.from("products").update({ status, ...extra }).eq("id", productId);
+  if (error) throw toUpstream(error);
+}

@@ -15,10 +15,11 @@ import {
   getOwnProduct,
   insertProduct,
   insertProductImage,
+  setProductStatus,
   updateProductRow,
   type ProductWriteRow,
 } from "@/features/products/repository";
-import { createDraft, updateDraft, type DraftRow } from "@/features/products/service";
+import { createDraft, submitForReview, updateDraft, type DraftRow } from "@/features/products/service";
 import { getOwnDeveloper } from "@/features/developers/repository";
 
 async function reqId(): Promise<string | undefined> {
@@ -84,6 +85,37 @@ export async function updateDraftAction(productId: string, form: Record<string, 
     },
     { module: "products", action: "product_draft_save", requestId },
   );
+}
+
+/** L1 — developer kirim draft/rejected → submitted (validasi penuh + skor). */
+export async function submitProductAction(productId: string) {
+  const requestId = await reqId();
+  const result = await runAction(
+    async () => {
+      const { supabase, developerId } = await developerIdForCurrentUser();
+      const out = await submitForReview(
+        developerId,
+        productId,
+        {
+          getOwnProduct: async (id) => {
+            const p = await getOwnProduct(supabase, id, developerId);
+            return p ? { id: p.id, status: p.status, developer_id: p.developer_id } : null;
+          },
+          getFullProduct: async (id) => {
+            const p = await getOwnProduct(supabase, id, developerId);
+            return (p ?? null) as unknown as Record<string, unknown> | null;
+          },
+          setStatus: (id, status, extra) => setProductStatus(supabase, id, status, extra ?? {}),
+          countImages: (id) => countProductImages(supabase, id),
+        },
+        { requestId },
+      );
+      revalidatePath("/dashboard/products");
+      return out;
+    },
+    { module: "products", action: "product_submit", requestId },
+  );
+  return result;
 }
 
 /** L1 — upload screenshot (≤5, @2MB, jpg/png/webp, nama disanitasi). */

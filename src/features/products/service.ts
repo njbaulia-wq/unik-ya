@@ -203,3 +203,121 @@ export async function updateDraft(
   await deps.persist(product.id, patch);
   logger.info("Draft produk diperbarui.", { module: "products", action: "product_draft_save", requestId: ctx.requestId });
 }
+
+function toFieldErrors(issues: { path: readonly unknown[]; message: string }[]): { field: string; message: string }[] {
+  return issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message }));
+}
+
+// ================= LIFECYCLE (submit + transisi, T12) =================
+
+export type ProductStatus =
+  | "draft"
+  | "submitted"
+  | "under_review"
+  | "approved"
+  | "published"
+  | "rejected"
+  | "suspended"
+  | "archived";
+
+/** Transisi legal (cermin trigger 0006_status_checks.sql + peran). */
+const TRANSITIONS: Record<ProductStatus, { to: ProductStatus; by: "developer" | "admin" }[]> = {
+  draft: [{ to: "submitted", by: "developer" }],
+  submitted: [
+    { to: "under_review", by: "admin" },
+    { to: "draft", by: "admin" },
+  ],
+  under_review: [
+    { to: "approved", by: "admin" },
+    { to: "rejected", by: "admin" },
+    { to: "draft", by: "admin" },
+  ],
+  approved: [{ to: "published", by: "admin" }],
+  published: [
+    { to: "suspended", by: "admin" },
+    { to: "archived", by: "admin" },
+  ],
+  rejected: [{ to: "draft", by: "developer" }],
+  suspended: [
+    { to: "published", by: "admin" },
+    { to: "archived", by: "admin" },
+  ],
+  archived: [],
+};
+
+/** Ilegal → CONFLICT dengan pesan jelas; peran tak cukup → FORBIDDEN. */
+export function assertTransition(from: ProductStatus, to: ProductStatus, actor: "developer" | "admin"): void {
+  const rule = (TRANSITIONS[from] ?? []).find((r) => r.to === to);
+  if (!rule) {
+    throw conflict(`Status tidak dapat diubah dari ${from} ke ${to}.`);
+  }
+  if (rule.by === "admin" && actor !== "admin") {
+    throw forbidden("Hanya admin yang dapat melakukan tindakan ini.");
+  }
+}
+
+export interface LifecycleDeps {
+  getOwnProduct: (productId: string) => Promise<{ id: string; status: string; developer_id: string } | null>;
+  getFullProduct: (productId: string) => Promise<Record<string, unknown> | null>;
+  setStatus: (productId: string, status: ProductStatus, extra?: Record<string, unknown>) => Promise<void>;
+  countImages: (productId: string) => Promise<number>;
+}
+
+/**
+ * Developer kirim draft/rejected → submitted. Validasi penuh submit-schema
+ * (PRD §21) + hitung skor awal + verification_status pending.
+ */
+export async function submitForReview(
+  developerId: string,
+  productId: string,
+  deps: LifecycleDeps,
+  ctx: { requestId?: string },
+): Promise<{ score: number }> {
+  const own = await deps.getOwnProduct(productId);
+  if (!own || own.developer_id !== developerId) {
+    throw forbidden("Anda tidak memiliki akses untuk tindakan ini.");
+  }
+  if (!["draft", "rejected"].includes(own.status)) {
+    throw conflict(`Produk berstatus ${own.status} tidak dapat dikirim ulang.`);
+  }
+  const full = await deps.getFullProduct(productId);
+  const { productSubmitSchema } = await import("./schema");
+  const parsed = productSubmitSchema.safeParse({
+    name: full?.["name"],
+    shortDescription: full?.["short_description"],
+    categoryId: full?.["category_id"] ?? undefined,
+    productType: full?.["product_type"] ?? undefined,
+    description: full?.["description"],
+    features: full?.["features"] ?? [],
+    techStack: full?.["tech_stack"] ?? [],
+    demoUrl: full?.["demo_url"] ?? undefined,
+    documentationUrl: full?.["documentation_url"] ?? undefined,
+    repositoryUrl: full?.["repository_url"] ?? undefined,
+    videoUrl: full?.["video_url"] ?? undefined,
+    version: full?.["version"] ?? undefined,
+    licenseType: full?.["license_type"] ?? undefined,
+    pricingModel: full?.["pricing_model"] ?? undefined,
+    priceText: full?.["price_text"] ?? undefined,
+  });
+  if (!parsed.success) {
+    throw validationError(toFieldErrors(parsed.error.issues));
+  }
+  const { computeVerificationScore } = await import("@/features/verification/score");
+  const score = computeVerificationScore({
+    hasDemo: !!parsed.data.demoUrl,
+    hasDocs: !!parsed.data.documentationUrl,
+    screenshotCount: await deps.countImages(productId),
+    hasRepo: !!parsed.data.repositoryUrl,
+    licenseType: parsed.data.licenseType ?? "custom",
+    version: parsed.data.version ?? "0.1.0",
+    descriptionLength: (parsed.data.description ?? "").length,
+    techStackCount: (parsed.data.techStack ?? []).length,
+  });
+  await deps.setStatus(productId, "submitted", { verification_status: "pending", verification_score: score });
+  logger.info("Produk dikirim untuk review.", {
+    module: "products",
+    action: "product_submit",
+    requestId: ctx.requestId,
+  });
+  return { score };
+}

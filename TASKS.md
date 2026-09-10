@@ -240,8 +240,9 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"verification"`, `info action:"status_transition" + from→to + actorRole`; `warn` untuk transisi ditolak + `errorCode:CONFLICT`.
   - Validasi: Zod enum status + guard peran (developer hanya submit miliknya; VERIFIED hanya admin — ditegakkan di service + RLS).
 - Checklist:
-  - [ ] Unit test: semua transisi legal/ilegal + bobot skor =100 + ambang NEW/UPDATED/POPULAR/LIVE DEMO
-  - [ ] Commit di `agent/product-lifecycle`
+  - [x] Unit test: semua transisi legal/ilegal + bobot skor =100 + ambang NEW/UPDATED/POPULAR/LIVE DEMO
+  - [x] Commit di `agent/product-lifecycle`
+- Progres T12: verification score deterministik + schema, trigger 0006 (transisi+slug immutable+published_at), assertTransition + submitForReview + submit action + tombol kirim di edit page. QA: 55+ test, typecheck, build lolos.
 
 ---
 
