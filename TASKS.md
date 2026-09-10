@@ -258,8 +258,9 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"admin"`, tiap mutasi `info/error` + `actorId + targetId + action + reason + request-id`; audit_logs immutable (tanpa update/delete via RLS).
   - Validasi: Zod untuk tiap aksi + reason; rename kategori tidak boleh ubah slug.
 - Checklist:
-  - [ ] Semua mutasi tercatat; test peran §75–76 lolos
-  - [ ] Commit di `agent/admin-moderation`
+  - [x] Semua mutasi tercatat; test peran §75–76 lolos
+  - [x] Commit di `agent/admin-moderation`
+- Progres T13: audit_logs immutable (0007) + admin schema/service/repo/actions + halaman overview/pending/creators/categories + guard admin. QA: 61 test, typecheck, lint, build lolos.
 
 ### T14 — Contact flow + demo click (tanpa login, anti-spam)
 - Branch: `agent/contact-flow` | Dep: T08, T10 | PRD: §16–17
