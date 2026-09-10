@@ -221,6 +221,33 @@ npm run typecheck && npm run lint && npm test && npm run build
 - Set env production + `NEXT_PUBLIC_SITE_URL` kanonisal
 - Target Lighthouse: Performance/Accessibility/Best Practices ≥ 90, SEO ≥ 95 (ukur pasca-deploy dengan data live)
 
+### Deploy ke Vercel (disarankan untuk MVP)
+
+Prasyarat: project Supabase sudah ada + migrasi `0001–0009` + seed sudah
+dijalankan (lihat [Database](#database)), dan 5 env var sudah siap
+(lihat [Environment Variables](#environment-variables)).
+
+1. Push repo ini ke GitHub, lalu di [vercel.com](https://vercel.com) → **Add New → Project → Import** repo tersebut. Framework Preset otomatis terdeteksi **Next.js** — biarkan Build Command (`next build`) dan Output Directory (default) apa adanya.
+2. Di **Environment Variables**, tambahkan kelima variable (Production + Preview):
+   `NEXT_PUBLIC_SITE_URL` (isi URL produksi, mis. `https://devmarket.vercel.app` — update lagi setelah domain final),
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_BOOTSTRAP_TOKEN`.
+3. Klik **Deploy**. Tunggu hingga ✅ (typecheck + lint + build sudah lolos di CI lokal; Vercel menjalankan `next build` yang sama).
+4. Pasca-deploy, verifikasi berurutan:
+   - Buka `/` (harus 200 + hero tampil), `/products`, satu `/products/[slug]`, `/sitemap.xml`
+   - Buka `/dashboard` tanpa login → harus dialihkan ke `/login`
+   - Promosikan admin pertama dari laptop webhook lokal (jangan di console browser):
+     ```bash
+     ADMIN_BOOTSTRAP_TOKEN=... SUPABASE_SERVICE_ROLE_KEY=... \
+     NEXT_PUBLIC_SUPABASE_URL=... node scripts/bootstrap-admin.mjs nama@email.com
+     ```
+   - Login → `/admin` → setujui satu produk → cek tampil di homepage
+5. (Opsional) Pasang domain sendiri di **Settings → Domains**, lalu update `NEXT_PUBLIC_SITE_URL` ke domain final dan **Redeploy**.
+
+> Catatan jujur: rate-limit klik (`src/lib/ratelimit.ts`) in-memory per instance —
+> di Vercel multi-instance, batas 10x/10 mnt berlaku per instance. Cukup untuk
+> v1; naik ke Redis saat traffic butuh (tanpa ubah API).
+
 ---
 
 ## Setup Admin
