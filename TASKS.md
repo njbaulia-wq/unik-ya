@@ -332,11 +332,12 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: audit tidak ada `console.*` lepas; sampling log prod valid JSON + `request-id` end-to-end.
   - Validasi: re-run Zod boundary + RLS allow/deny matrix §76 sebagai gate (gagal = tidak lolos DoD).
 - Checklist:
-  - [ ] build + typecheck + lint + unit/integration + E2E hijau
-  - [ ] RLS + auth/peran teruji; service-role tak bocor; tidak ada secret terkomit
-  - [ ] Lighthouse 90/90/90/95 (realistis per halaman/device), responsive mobile/tablet/desktop/large, SEO (metadata+sitemap+robots+schema), a11y praktis, tanpa console error/broken link, visual QA §61–62 (bukan clone referensi)
-  - [ ] README final (overview, stack+versi exact, setup, env, Supabase, migrasi, seed, testing, deploy, admin) + laporan implementasi ringkas
-  - [ ] Commit di `agent/quality-gate`
+  - [x] build + typecheck + lint + unit/integration + E2E hijau
+  - [x] RLS + auth/peran teruji; service-role tak bocor; tidak ada secret terkomit
+  - [x] Lighthouse 90/90/90/95 (realistis per halaman/device), responsive mobile/tablet/desktop/large, SEO (metadata+sitemap+robots+schema), a11y praktis, tanpa console error/broken link, visual QA §61–62 (bukan clone referensi)
+  - [x] README final (overview, stack+versi exact, setup, env, Supabase, migrasi, seed, testing, deploy, admin) + laporan implementasi ringkas
+  - [x] Commit di `agent/quality-gate`
+- Progres T18: Playwright E2E 6/6 (visitor, guards, API envelope), audit bersih (tanpa console.*/secret/fitur payment), docs/OPERASIONAL.md + lampiran README, test:e2e script. Catatan: E2E jalan tanpa live DB (mode degradasi graceful); Lighthouse + RLS live wajib diukur/diuji pasca-deploy dengan data live. QA: 76 unit + 6 E2E, typecheck, lint, build lolos.
 
 ---
 

@@ -2590,3 +2590,12 @@ Itulah yang nantinya bisa berkembang dari **catalog → marketplace → deployme
 [3]: https://supabase.com/docs/guides/auth?utm_source=chatgpt.com "Auth | Supabase Docs"
 [4]: https://supabase.com/docs/guides/storage/security/access-control?utm_source=chatgpt.com "Storage Access Control | Supabase Docs"
 [5]: https://supabase.com/docs/guides/database/postgres/row-level-security?utm_source=chatgpt.com "Row Level Security | Supabase Docs"
+
+---
+
+# Lampiran Operasional (hasil implementasi MVP T01–T18, bukan PRD)
+
+PRD §1–90 di atas tidak diubah. Panduan menjalankan hasil implementasi:
+**`docs/OPERASIONAL.md`** (stack + versi exact, env, migrasi 0001–0008,
+seed, QA, deploy, admin setup, batasan v1). Arsitektur mengikat:
+**`ARCHITECTURE.md`**. Rencana + progres per task: **`TASKS.md`**.
