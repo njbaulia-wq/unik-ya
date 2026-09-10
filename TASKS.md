@@ -145,9 +145,10 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"products"`, `info` per section `action:"homepage_section" + durationMs`; `error` + `errorCode` bila query gagal.
   - Validasi: query params homepage (mis. `?q=`) via Zod; tanpa query SQL dari input mentah.
 - Checklist:
-  - [ ] Tanpa login bisa dibuka, responsif, SEO metadata ada, tanpa broken image/overflow
-  - [ ] CTA primer Jelajahi Produk, sekunder Publikasikan Produk
-  - [ ] Commit di `agent/homepage`
+  - [x] Tanpa login bisa dibuka, responsif, SEO metadata ada, tanpa broken image/overflow
+  - [x] CTA primer Jelajahi Produk, sekunder Publikasikan Produk
+  - [x] Commit di `agent/homepage`
+- Progres T06: repo L3 (list published/featured/verified/new + kategori + developer, error→UPSTREAM generik), service L2 fallback per-section, ProductCard §14, homepage penuh. QA: 25 test, typecheck, lint, build (homepage static) lolos.
 
 ### T07 — Katalog + search FTS + filter + sort
 - Branch: `agent/catalog-search` | Dep: T06 | PRD: §23–24, §64
