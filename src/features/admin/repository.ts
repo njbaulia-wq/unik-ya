@@ -70,6 +70,11 @@ export async function setDeveloperVerified(supabase: SupabaseClient, developerId
   if (error) throw toUpstream(error);
 }
 
+export async function setDeveloperSuspended(supabase: SupabaseClient, developerId: string, suspended: boolean): Promise<void> {
+  const { error } = await supabase.from("developers").update({ suspended }).eq("id", developerId);
+  if (error) throw toUpstream(error);
+}
+
 export async function renameCategory(supabase: SupabaseClient, categoryId: string, name: string): Promise<void> {
   // Hanya display name — slug immutable (keputusan #4).
   const { error } = await supabase.from("categories").update({ name }).eq("id", categoryId);

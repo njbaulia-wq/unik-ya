@@ -45,7 +45,7 @@ export async function listCategories(supabase: SupabaseClient): Promise<Category
 }
 
 export async function listDevelopers(supabase: SupabaseClient, limit = 6): Promise<Developer[]> {
-  const { data, error } = await supabase.from("developers").select("*").order("created_at", { ascending: false }).limit(limit);
+  const { data, error } = await supabase.from("developers").select("*").eq("suspended", false).order("created_at", { ascending: false }).limit(limit);
   if (error) throw toUpstream(error);
   return (data ?? []) as unknown as Developer[];
 }

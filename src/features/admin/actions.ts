@@ -9,10 +9,11 @@ import {
   applyProductAction,
   getProductStatus,
   renameCategory as renameCategoryRepo,
+  setDeveloperSuspended,
   setDeveloperVerified,
   writeAudit,
 } from "@/features/admin/repository";
-import { moderateProduct, renameCategory, verifyDeveloper } from "@/features/admin/service";
+import { moderateProduct, renameCategory, suspendDeveloper, verifyDeveloper } from "@/features/admin/service";
 
 async function reqId(): Promise<string | undefined> {
   return (await headers()).get("x-request-id") ?? undefined;
@@ -73,5 +74,21 @@ export async function renameCategoryAction(form: { categoryId: string; name: str
       return { saved: true };
     },
     { module: "admin", action: "rename_category", requestId },
+  );
+}
+
+export async function suspendDeveloperAction(form: { developerId: string; suspended: boolean; reason?: string }) {
+  const requestId = await reqId();
+  return runAction(
+    async () => {
+      const { supabase, admin, audit } = await adminContext(requestId);
+      await suspendDeveloper(admin.isAdmin, admin.id, form, {
+        persist: (id, s) => setDeveloperSuspended(supabase, id, s),
+        audit,
+      }, { requestId });
+      revalidatePath("/admin");
+      return { saved: true };
+    },
+    { module: "admin", action: "suspend_developer", requestId },
   );
 }

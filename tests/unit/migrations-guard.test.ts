@@ -41,6 +41,11 @@ describe("guard migrasi SQL (non-goals + RLS)", () => {
     expect(sql).toMatch(/products_public_read[\s\S]*?status = 'published'/);
   });
 
+  it("suspend creator tersedia (PRD §22): kolom + policy publik", () => {
+    expect(sql).toContain("suspended BOOLEAN");
+    expect(sql).toMatch(/developers_public_read[\s\S]*?suspended = FALSE/);
+  });
+
   it("bucket storage benar + tanpa bucket video", () => {
     expect(sql).toContain("product-images");
     expect(sql).toContain("avatars");

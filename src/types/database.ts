@@ -58,6 +58,7 @@ export interface Developer {
   website_url: string | null;
   github_url: string | null;
   verified: boolean;
+  suspended?: boolean;
   created_at: string;
   updated_at: string;
 }

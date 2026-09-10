@@ -13,13 +13,13 @@ export interface DeveloperProfile extends Developer {
 
 /** L3 developers — profil publik + agregat tanpa kolom revenue (PRD §18). */
 export async function getDeveloperBySlug(supabase: SupabaseClient, slug: string): Promise<Developer | null> {
-  const { data, error } = await supabase.from("developers").select("*").eq("slug", slug).maybeSingle();
+  const { data, error } = await supabase.from("developers").select("*").eq("slug", slug).eq("suspended", false).maybeSingle();
   if (error) throw toUpstream(error);
   return (data ?? null) as unknown as Developer | null;
 }
 
 export async function listDevelopersPage(supabase: SupabaseClient, limit = 24): Promise<Developer[]> {
-  const { data, error } = await supabase.from("developers").select("*").order("created_at", { ascending: false }).limit(limit);
+  const { data, error } = await supabase.from("developers").select("*").eq("suspended", false).order("created_at", { ascending: false }).limit(limit);
   if (error) throw toUpstream(error);
   return (data ?? []) as unknown as Developer[];
 }

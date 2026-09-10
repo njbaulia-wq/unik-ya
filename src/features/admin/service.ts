@@ -1,7 +1,7 @@
 import { forbidden, validationError } from "@/lib/error";
 import { logger } from "@/lib/logger";
 import { assertTransition, type ProductStatus } from "@/features/products/service";
-import { adminActionSchema, renameCategorySchema, verifyDeveloperSchema } from "./schema";
+import { adminActionSchema, renameCategorySchema, suspendDeveloperSchema, verifyDeveloperSchema } from "./schema";
 import type { AdminActionInput } from "./schema";
 
 /** Petakan aksi admin → (status tujuan, patch tambahan). */
@@ -85,6 +85,29 @@ export async function verifyDeveloper(
     target_id: parsed.data.developerId,
   });
   logger.info("Verifikasi developer diubah.", { module: "admin", requestId: ctx.requestId, userId: actorId });
+}
+
+/** Suspend/unsuspend creator bermasalah — produknya ikut tersembunyi publik. */
+export async function suspendDeveloper(
+  isAdmin: boolean,
+  actorId: string,
+  raw: unknown,
+  deps: { persist: (developerId: string, suspended: boolean) => Promise<void>; audit: AdminDeps["audit"] },
+  ctx: { requestId?: string },
+): Promise<void> {
+  if (!isAdmin) throw forbidden();
+  const parsed = suspendDeveloperSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw validationError(parsed.error.issues.map((i) => ({ field: String(i.path[0]), message: i.message })));
+  }
+  await deps.persist(parsed.data.developerId, parsed.data.suspended);
+  await deps.audit({
+    action: parsed.data.suspended ? "suspend_developer" : "unsuspend_developer",
+    target_type: "developer",
+    target_id: parsed.data.developerId,
+    reason: parsed.data.reason ?? null,
+  });
+  logger.info("Suspend developer diubah.", { module: "admin", requestId: ctx.requestId, userId: actorId });
 }
 
 export async function renameCategory(

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { moderateProduct, renameCategory, verifyDeveloper } from "@/features/admin/service";
+import { moderateProduct, renameCategory, suspendDeveloper, verifyDeveloper } from "@/features/admin/service";
 
 const auditRows: { action: string; target_type: string; target_id: string; reason?: string | null }[] = [];
 const deps = {
@@ -69,6 +69,19 @@ describe("admin moderation", () => {
     await renameCategory(true, "a", { categoryId: "123e4567-e89b-12d3-a456-426614174000", name: "SaaS Baru" }, d, {});
     expect(calls).toEqual(["persist", "audit", "persist", "audit"]);
     await expect(verifyDeveloper(false, "a", { developerId: "123e4567-e89b-12d3-a456-426614174000", verified: true }, d, {})).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+  });
+
+  it("suspend developer teraudit; non-admin ditolak", async () => {
+    const calls: string[] = [];
+    const d = {
+      persist: async () => { calls.push("persist"); },
+      audit: async () => { calls.push("audit"); },
+    };
+    await suspendDeveloper(true, "a", { developerId: "123e4567-e89b-12d3-a456-426614174000", suspended: true }, d, {});
+    expect(calls).toEqual(["persist", "audit"]);
+    await expect(suspendDeveloper(false, "a", { developerId: "123e4567-e89b-12d3-a456-426614174000", suspended: true }, d, {})).rejects.toMatchObject({
       code: "FORBIDDEN",
     });
   });

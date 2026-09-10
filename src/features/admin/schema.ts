@@ -29,6 +29,12 @@ export const verifyDeveloperSchema = z.strictObject({
   verified: z.boolean(),
 });
 
+export const suspendDeveloperSchema = z.strictObject({
+  developerId: z.string().uuid("Developer tidak dikenal."),
+  suspended: z.boolean(),
+  reason: z.string().trim().max(500).optional(),
+});
+
 export const renameCategorySchema = z.strictObject({
   categoryId: z.string().uuid("Kategori tidak dikenal."),
   name: z.string().trim().min(2, "Nama minimal 2 karakter.").max(60),
