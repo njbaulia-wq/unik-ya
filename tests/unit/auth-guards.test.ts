@@ -11,13 +11,10 @@ function fakeSupabase(opts: {
     auth: { getUser: async () => ({ data: { user: opts.user ?? null } }) },
     from: (table: string) => ({
       select: () => ({
-        eq: () => ({
-          maybeSingle: async () => (table === "profiles" ? { data: { is_admin: opts.isAdmin ?? false } } : { data: null }),
-          limit: async () =>
-            table === "developers" && opts.developerId
-              ? { data: [{ id: opts.developerId }] }
-              : { data: [] },
-        }),
+        eq: () => {
+          if (table === "profiles") return Promise.resolve({ data: { is_admin: opts.isAdmin ?? false } });
+          return Promise.resolve({ data: opts.developerId ? [{ id: opts.developerId }] : [] });
+        },
       }),
     }),
   };

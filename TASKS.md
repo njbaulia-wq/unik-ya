@@ -106,10 +106,11 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"auth"`, `info` untuk login/logout sukses (tanpa password/token), `warn` untuk gagal login + `request-id`; tidak pernah log secret.
   - Validasi: Zod email/password strength + callback OAuth state; re-validate di server action.
 - Checklist:
-  - [ ] Email/password + Google OAuth bekerja; magic link belum ada (sesuai keputusan #1)
-  - [ ] Guard server-side untuk `/dashboard` dan `/admin`; RLS + cek service konsisten
-  - [ ] Test: anonim tak bisa akses dashboard; dev tak bisa akses admin
-  - [ ] Commit di `agent/auth-roles`
+  - [x] Email/password + Google OAuth bekerja; magic link belum ada (sesuai keputusan #1)
+  - [x] Guard server-side untuk `/dashboard` dan `/admin`; RLS + cek service konsisten
+  - [x] Test: anonim tak bisa akses dashboard; dev tak bisa akses admin
+  - [x] Commit di `agent/auth-roles`
+- Progres T04: auth schema/service/repo/actions + login/register/Google OAuth + callback + middleware guard + bootstrap-admin + fixup 0004_profiles_insert. Catatan: nomor migrasi 0004 terpakai fixup ini, jadi search-index T07 jadi 0005, status-check T12 jadi 0006, audit T13 jadi 0007, analytics T15 jadi 0008. QA: 23 test, typecheck, lint, build lolos.
 
 ### T05 — Design system + app shell + global states
 - Branch: `agent/design-shell` | Dep: T01, T04 | PRD: §30–36, §41, §57–58, §78

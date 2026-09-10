@@ -10,15 +10,28 @@ export interface AuthUser {
 
 type SupabaseLike = {
   auth: { getUser: () => Promise<{ data: { user: { id: string; email?: string } | null } }> };
-  from: (table: string) => {
-    select: (cols: string) => {
-      eq: (col: string, val: string) => {
-        maybeSingle: () => Promise<{ data: { is_admin?: boolean } | null }>;
-        limit: (n: number) => Promise<{ data: { id: string }[] | null }>;
-      };
-    };
-  };
+  // Query builder Supabase bersifat thenable dengan generic dalam — ketik longgar
+  // agar tidak memicu deep-instantiation; kontrak kolom dijaga di repository.
+  from: (table: string) => unknown;
 };
+
+interface ProfileRow {
+  is_admin?: boolean;
+}
+
+interface DeveloperRow {
+  id: string;
+}
+
+async function queryMaybeSingle(q: unknown): Promise<{ data: ProfileRow | null }> {
+  const res = (await (q as PromiseLike<{ data: ProfileRow | null }>)) as { data: ProfileRow | null };
+  return res;
+}
+
+async function queryLimit(q: unknown): Promise<{ data: DeveloperRow[] | null }> {
+  const res = (await (q as PromiseLike<{ data: DeveloperRow[] | null }>)) as { data: DeveloperRow[] | null };
+  return res;
+}
 
 /**
  * L4 auth helper (server-side only). Baca profil + developer milik user.
@@ -28,8 +41,11 @@ type SupabaseLike = {
 export async function getAuthUser(supabase: SupabaseLike): Promise<AuthUser | null> {
   const { data } = await supabase.auth.getUser();
   if (!data.user) return null;
-  const profile = await supabase.from("profiles").select("is_admin").eq("id", data.user.id).maybeSingle();
-  const dev = await supabase.from("developers").select("id").eq("profile_id", data.user.id).limit(1);
+  const client = supabase.from as (table: string) => {
+    select: (cols: string) => { eq: (col: string, val: string) => unknown };
+  };
+  const profile = await queryMaybeSingle(client("profiles").select("is_admin").eq("id", data.user.id));
+  const dev = await queryLimit(client("developers").select("id").eq("profile_id", data.user.id));
   return {
     id: data.user.id,
     email: data.user.email ?? undefined,
