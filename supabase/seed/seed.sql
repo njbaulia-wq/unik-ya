@@ -1,8 +1,32 @@
 -- seed.sql — data demo fiktif DevMarket (PRD §59–60). JELAS FIKTIF, bukan customer asli.
--- Idempoten: semua INSERT memakai ON CONFLICT DO NOTHING → aman dijalankan ulang.
--- Urutan: profiles → developers → socials → categories → tags → products → versions/images/tags.
--- Syarat: UUID profiles di bawah harus cocok dengan auth.users (buat via sign-up dulu,
--- lalu samakan id-nya) ATAU jalankan dengan RLS bypass (service role / SQL editor).
+-- Idempoten: semua INSERT memakai ON CONFLICT DO NOTHING / guard anti-duplikat → aman dijalankan ulang.
+-- Urutan: auth.users → profiles → developers → socials → categories → tags → products → versions/images/tags.
+-- Cukup jalankan file ini sekali di Supabase SQL editor (service role / bypass RLS).
+
+-- ============ AUTH USERS (10, UUID tetap, DEMO ONLY) ============
+-- profiles.id adalah FK ke auth.users(id), jadi user auth harus ada dulu.
+-- Password demo: devmarket-demo-123 (bcrypt). Email langsung terkonfirmasi.
+-- JANGAN pakai pola ini untuk user asli — hanya untuk seed fiktif.
+INSERT INTO auth.users
+  (id, aud, role, email, encrypted_password, email_confirmed_at,
+   raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at)
+SELECT
+  ('11111111-1111-1111-1111-0000000000' || lpad(e.n::text, 2, '0'))::uuid,
+  'authenticated', 'authenticated',
+  e.email,
+  '$2b$12$ENfzF0h57Ve7JAT8HNEOkuyRkLcMbYuGW9zneRhwteGkTfH6PSStW',
+  now(),
+  '{"provider":"email","providers":["email"]}',
+  '{}',
+  FALSE, now(), now()
+FROM (VALUES
+  (1,'rizky@contoh.dev'),(2,'sinta@contoh.dev'),(3,'andi@contoh.dev'),
+  (4,'maya@contoh.dev'),(5,'budi@contoh.dev'),(6,'dewi@contoh.dev'),
+  (7,'fajar@contoh.dev'),(8,'intan@contoh.dev'),(9,'yoga@contoh.dev'),
+  (10,'ratna@contoh.dev')
+) AS e(n, email)
+LEFT JOIN auth.users u ON u.id = ('11111111-1111-1111-1111-0000000000' || lpad(e.n::text, 2, '0'))::uuid
+WHERE u.id IS NULL;
 
 -- ============ PROFILES (10, UUID tetap) ============
 INSERT INTO profiles (id, email, is_admin) VALUES
