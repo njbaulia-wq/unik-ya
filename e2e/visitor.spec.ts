@@ -24,7 +24,7 @@ test("katalog: filter + graceful degradation tanpa DB", async ({ page }) => {
 test("produk tak dikenal → graceful 404/error jelas (bukan stack trace)", async ({ page }) => {
   await page.goto("/products/slug-yang-tak-ada-xyz");
   // Dengan live DB: 404 "Halaman tidak ditemukan". Tanpa DB: error boundary aman.
+  await expect(page.locator("main")).toContainText(/Halaman tidak ditemukan|Terjadi kesalahan/);
   const body = await page.textContent("main");
-  expect(body).toMatch(/Halaman tidak ditemukan|Terjadi kesalahan/);
   expect(body).not.toMatch(/__NEXT_DATA__|at async|node_modules/);
 });
