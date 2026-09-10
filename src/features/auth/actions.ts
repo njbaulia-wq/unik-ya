@@ -17,7 +17,7 @@ async function reqId(): Promise<string | undefined> {
   return (await headers()).get("x-request-id") ?? undefined;
 }
 
-export async function loginAction(form: { email: string; password: string }) {
+export async function loginAction(form: { email: string; password: string }, next?: string) {
   const requestId = await reqId();
   const parsed = loginSchema.safeParse(form);
   if (!parsed.success) {
@@ -38,7 +38,7 @@ export async function loginAction(form: { email: string; password: string }) {
       }
       const user = await getAuthUser(supabase);
       logger.info("Login berhasil.", { module: "auth", requestId, userId: user?.id });
-      return { redirectTo: postLoginRedirect({ isAdmin: user?.isAdmin ?? false, developerId: user?.developerId ?? null }) };
+      return { redirectTo: postLoginRedirect({ isAdmin: user?.isAdmin ?? false, developerId: user?.developerId ?? null }, next) };
     },
     { module: "auth", action: "login", requestId },
   );
