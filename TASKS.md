@@ -125,10 +125,11 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"ui"`, log render-error boundary level `error` + `route` + `request-id`.
   - Validasi: props komponen kritis (mis. ProductCard) diberi tipe strict; a11y: label, focus, alt, dialog accessible.
 - Checklist:
-  - [ ] Tipografi netral, 1 aksen, border halus, radius moderat; tanpa gradient/glass/blob (PRD §31)
-  - [ ] Grid 3/2/1, max-w 1200–1280, nav mobile khusus (bukan desktop dikecilkan)
-  - [ ] Semua state §57–58 ada dan berbahasa Indonesia jelas
-  - [ ] Commit di `agent/design-shell`
+  - [x] Tipografi netral, 1 aksen, border halus, radius moderat; tanpa gradient/glass/blob (PRD §31)
+  - [x] Grid 3/2/1, max-w 1200–1280, nav mobile khusus (bukan desktop dikecilkan)
+  - [x] Semua state §57–58 ada dan berbahasa Indonesia jelas
+  - [x] Commit di `agent/design-shell`
+- Progres T05: layout+header/footer+nav mobile, primitif UI (Button/Badge/Card/Field), States ID, loading/error/not-found/unauthorized, copy.ts. QA: typecheck, lint, build, 23 test lolos.
 
 ---
 

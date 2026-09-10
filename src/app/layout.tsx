@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import { Header, Footer } from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "DevMarket — Temukan software yang sudah jadi",
@@ -9,7 +9,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id">
-      <body>{children}</body>
+      <body>
+        <a href="#konten" className="sr-only focus:not-sr-only">
+          Lewati ke konten
+        </a>
+        <Header />
+        <div id="konten">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }
