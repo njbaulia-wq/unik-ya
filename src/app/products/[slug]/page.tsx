@@ -18,6 +18,9 @@ import {
 import { VerificationBadges } from "@/features/products/components/VerificationBadges";
 import { ContactChannels } from "@/features/products/components/ContactCTA";
 import { ContactFlow } from "@/features/products/components/ContactModal";
+import { FavoriteButton } from "@/features/favorites/components/FavoriteButton";
+import { isFavorited } from "@/features/favorites/repository";
+import { getAuthUser } from "@/lib/auth";
 import { ProductCard } from "@/features/products/components/ProductCard";
 
 interface Props {
@@ -71,9 +74,12 @@ export default async function ProductDetailPage({ params }: Props) {
   if (!loaded) notFound();
   const { product, socials, similar } = loaded;
   // Best-effort: view tercatat tanpa IP mentah; gagal → halaman tetap jalan.
+  let initialSaved = false;
   try {
     const supabase = await createServerSupabase();
     await recordView(product.id, hashIp(ip), { insertView: (row) => insertView(supabase, row) }, { requestId });
+    const user = await getAuthUser(supabase);
+    if (user) initialSaved = await isFavorited(supabase, user.id, product.id);
   } catch {
     // Diabaikan — recordView tidak pernah throw; jaring terakhir.
   }
@@ -123,8 +129,9 @@ export default async function ProductDetailPage({ params }: Props) {
             </Link>
             {product.verification_status === "verified" && <span> · ✓ Platform Verified</span>}
           </p>
-          <div className="mt-4">
+          <div className="mt-4 flex flex-wrap gap-2">
             <ContactFlow demoUrl={product.demo_url} socials={socials} productSlug={product.slug} />
+            <FavoriteButton productSlug={product.slug} initialSaved={initialSaved} />
           </div>
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
