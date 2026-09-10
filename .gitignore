@@ -1,0 +1,13 @@
+# dependencies
+node_modules/
+# next
+.next/
+out/
+# env secrets — jangan pernah commit file ini
+.env
+.env.local
+.env*.local
+# testing / coverage
+coverage/
+# logs
+*.log
