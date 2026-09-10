@@ -300,8 +300,9 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"favorites"`, `info action:"favorite_toggle"`.
   - Validasi: Zod `{ productSlug }`; pastikan produk published sebelum bisa difavoritkan.
 - Checklist:
-  - [ ] Idempoten + RLS user-kelola-miliknya
-  - [ ] Commit di `agent/favorites`
+  - [x] Idempoten + RLS user-kelola-miliknya
+  - [x] Commit di `agent/favorites`
+- Progres T16: favorites schema/service/repo/actions + FavoriteButton + halaman dashboard + wiring detail page. QA: 73 test, typecheck, lint, build lolos.
 
 ---
 
