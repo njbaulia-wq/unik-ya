@@ -125,6 +125,16 @@ export default async function ProductDetailPage({ params }: Props) {
           <div className="mt-3">
             <VerificationBadges product={product} />
           </div>
+          <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+            <div className="flex gap-2">
+              <dt className="text-zinc-500">Harga</dt>
+              <dd className="font-medium">{product.price_text || "Hubungi developer"}</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="text-zinc-500">Skor kualitas</dt>
+              <dd className="font-medium">{product.verification_score} / 100</dd>
+            </div>
+          </dl>
           <p className="mt-3 text-sm text-zinc-600">
             oleh{" "}
             <Link href={`/developers/${product.developers?.slug ?? ""}`} className="font-medium text-zinc-900">
