@@ -178,9 +178,10 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"products"`, `info action:"product_view"` (terpisah dari log operasional; tanpa IP mentah — lihat T15).
   - Validasi: Zod untuk `slug` (lowercase, pola aman); URL demo/repo hanya `https://`.
 - Checklist:
-  - [ ] Slug bekerja, screenshot/stack/creator/verified benar, Live Demo + Contact bekerja, similar tampil, mobile baik, SEO (title/desc/canonical/OG/Twitter) + schema jujur
-  - [ ] Istilah "Platform Verification", bukan "Security Certified"
-  - [ ] Commit di `agent/product-detail`
+  - [x] Slug bekerja, screenshot/stack/creator/verified benar, Live Demo + Contact bekerja, similar tampil, mobile baik, SEO (title/desc/canonical/OG/Twitter) + schema jujur
+  - [x] Istilah "Platform Verification", bukan "Security Certified"
+  - [x] Commit di `agent/product-detail`
+- Progres T08: repo bySlug+similar+socials, service detail (non-published→NOT_FOUND) + deriveBadges, halaman /products/[slug] + metadata + JSON-LD jujur, ContactCTA/channels sementara (modal+tracking di T14). QA: 34 test, typecheck, lint, build lolos.
 
 ### T09 — Developer profile + kategori + halaman statis + sitemap/robots
 - Branch: `agent/profiles-categories-seo` | Dep: T08 | PRD: §18, §39–40, §65

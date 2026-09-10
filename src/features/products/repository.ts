@@ -49,3 +49,40 @@ export async function listDevelopers(supabase: SupabaseClient, limit = 6): Promi
   if (error) throw toUpstream(error);
   return (data ?? []) as unknown as Developer[];
 }
+
+export async function getProductBySlug(supabase: SupabaseClient, slug: string): Promise<ProductWithRelations | null> {
+  const { data, error } = await supabase.from("products").select(SELECT).eq("slug", slug).maybeSingle();
+  if (error) throw toUpstream(error);
+  return (data ?? null) as unknown as ProductWithRelations | null;
+}
+
+export async function listSimilarProducts(
+  supabase: SupabaseClient,
+  opts: { categoryId: string | null; excludeId: string; limit?: number },
+): Promise<ProductWithRelations[]> {
+  let query = supabase
+    .from("products")
+    .select(SELECT)
+    .eq("status", "published")
+    .neq("id", opts.excludeId);
+  if (opts.categoryId) query = query.eq("category_id", opts.categoryId);
+  const { data, error } = await query.order("verification_score", { ascending: false }).limit(opts.limit ?? 4);
+  if (error) throw toUpstream(error);
+  return (data ?? []) as unknown as ProductWithRelations[];
+}
+
+export interface DeveloperSocial {
+  channel: string;
+  value: string;
+  enabled: boolean;
+}
+
+export async function getDeveloperSocials(supabase: SupabaseClient, developerId: string): Promise<DeveloperSocial[]> {
+  const { data, error } = await supabase
+    .from("developers_socials")
+    .select("channel,value,enabled")
+    .eq("developer_id", developerId)
+    .eq("enabled", true);
+  if (error) throw toUpstream(error);
+  return (data ?? []) as unknown as DeveloperSocial[];
+}
