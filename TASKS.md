@@ -163,9 +163,10 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"search"`, `info action:"search" + query(normalized, tanpa PII) + resultCount + durationMs`.
   - Validasi: Zod untuk `q/category/productType/technology/verified/hasDemo/sort/page`; clamp pagination; escape FTS input.
 - Checklist:
-  - [ ] Tanpa Elasticsearch; ada EXPLAIN/index untuk kolom search; tanpa N+1
-  - [ ] Empty result membantu sesuai PRD §64
-  - [ ] Commit di `agent/catalog-search`
+  - [x] Tanpa Elasticsearch; ada EXPLAIN/index untuk kolom search; tanpa N+1
+  - [x] Empty result membantu sesuai PRD §64
+  - [x] Commit di `agent/catalog-search`
+- Progres T07: migrasi 0005 (search_vector trigger + GIN + index filter/sort), search schema/service/repo (tsquery sanitasi, filter kategori/tipe/teknologi/verified/demo, sort 4 mode, pagination), halaman /products + EmptyResults. QA: 28 test, typecheck, lint, build lolos.
 
 ### T08 — Product detail (`/products/[slug]`) + SEO + structured data
 - Branch: `agent/product-detail` | Dep: T07 | PRD: §15–16, §37–38, §73
