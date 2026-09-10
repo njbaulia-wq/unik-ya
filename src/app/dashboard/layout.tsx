@@ -24,6 +24,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <Link href="/dashboard/profile" className="rounded-lg px-3 py-2 hover:bg-zinc-100">Profil</Link>
         <Link href="/dashboard/contacts" className="rounded-lg px-3 py-2 hover:bg-zinc-100">Kontak</Link>
         <Link href="/dashboard/favorites" className="rounded-lg px-3 py-2 hover:bg-zinc-100">Favorit</Link>
+        <Link href="/dashboard/settings" className="rounded-lg px-3 py-2 hover:bg-zinc-100">Pengaturan</Link>
       </nav>
       <div className="min-w-0 flex-1">{children}</div>
     </div>
