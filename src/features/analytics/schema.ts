@@ -21,3 +21,15 @@ export const clickEventSchema = z.strictObject({
 });
 
 export type ClickEvent = z.infer<typeof clickEventSchema>;
+
+/**
+ * Event non-DB (keputusan #8, privasi minimal): developer_profile_view,
+ * search, favorite dicatat sebagai structured log operasional (bukan tabel),
+ * dengan payload minimal tanpa PII. product_view/demo/contact masuk DB.
+ */
+export const logEventSchema = z.strictObject({
+  type: z.enum(["developer_profile_view", "search", "favorite"]),
+  ref: z.string().trim().max(120),
+});
+
+export type LogEvent = z.infer<typeof logEventSchema>;

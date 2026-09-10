@@ -286,8 +286,9 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: pisahkan log operasional vs event bisnis; tanpa IP mentah (hash+salt harian); retensi 12 bln.
   - Validasi: Zod event payload minimal; tolak PII berlebih.
 - Checklist:
-  - [ ] KPI §88 bisa dihitung (≥20 produk, ≥10 dev, views/demo/contact); tanpa tracking lintas situs
-  - [ ] Commit di `agent/analytics-kpi`
+  - [x] KPI §88 bisa dihitung (≥20 produk, ≥10 dev, views/demo/contact); tanpa tracking lintas situs
+  - [x] Commit di `agent/analytics-kpi`
+- Progres T15: migrasi 0008 (index+retensi), view/click repo, hash IP+salt, recordView best-effort, KPI murni, wiring view+search+profile, halaman /admin/reports. QA: 70 test, typecheck, lint, build lolos.
 
 ### T16 — Favorites (login wajib)
 - Branch: `agent/favorites` | Dep: T04, T08 | PRD: §26

@@ -6,6 +6,7 @@ import { createServerSupabase } from "@/lib/db";
 import { getEnv } from "@/lib/env";
 import { AppError } from "@/lib/error";
 import { getDeveloperProfile } from "@/features/developers/service";
+import { logBusinessEvent } from "@/features/analytics/service";
 import { getDeveloperBySlug, listDeveloperProducts } from "@/features/developers/repository";
 import { ProductCard } from "@/features/products/components/ProductCard";
 
@@ -50,6 +51,7 @@ export default async function DeveloperProfilePage({ params }: Props) {
   }
   if (!data) notFound();
   const { profile, products, stats } = data;
+  logBusinessEvent({ type: "developer_profile_view", ref: profile.slug }, { requestId });
 
   return (
     <main className="container-page py-8">

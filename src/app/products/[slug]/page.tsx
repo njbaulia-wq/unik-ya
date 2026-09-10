@@ -7,6 +7,8 @@ import { logger } from "@/lib/logger";
 import { AppError } from "@/lib/error";
 import { getEnv } from "@/lib/env";
 import { getProductDetail } from "@/features/products/service";
+import { hashIp, recordView } from "@/features/analytics/service";
+import { insertView } from "@/features/analytics/repository";
 import {
   coverUrl,
   getDeveloperSocials,
@@ -54,7 +56,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** L1 product detail (PRD §15): SEO dinamis + schema jujur + similar products. */
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
-  const requestId = (await headers()).get("x-request-id") ?? undefined;
+  const headerList = await headers();
+  const requestId = headerList.get("x-request-id") ?? undefined;
+  const ip = headerList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
   let loaded: Awaited<ReturnType<typeof loadSlug>> | null = null;
   try {
@@ -66,6 +70,13 @@ export default async function ProductDetailPage({ params }: Props) {
   }
   if (!loaded) notFound();
   const { product, socials, similar } = loaded;
+  // Best-effort: view tercatat tanpa IP mentah; gagal → halaman tetap jalan.
+  try {
+    const supabase = await createServerSupabase();
+    await recordView(product.id, hashIp(ip), { insertView: (row) => insertView(supabase, row) }, { requestId });
+  } catch {
+    // Diabaikan — recordView tidak pernah throw; jaring terakhir.
+  }
   const site = getEnv().NEXT_PUBLIC_SITE_URL;
 
   // Structured data jujur: tanpa klaim rating/review palsu; verifikasi

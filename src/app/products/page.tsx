@@ -7,6 +7,7 @@ import { copy } from "@/lib/copy";
 import { ErrorState } from "@/components/States";
 import { ProductCard } from "@/features/products/components/ProductCard";
 import { runSearch } from "@/features/search/service";
+import { logBusinessEvent } from "@/features/analytics/service";
 import { searchProducts } from "@/features/search/repository";
 import { EmptyResults } from "@/features/search/components/EmptyResults";
 
@@ -49,6 +50,7 @@ export default async function ProductsPage({ searchParams }: Props) {
       </main>
     );
   }
+  if (result.applied.q) logBusinessEvent({ type: "search", ref: result.applied.q.slice(0, 100) }, { requestId });
   return <Catalog result={result} />;
 }
 
