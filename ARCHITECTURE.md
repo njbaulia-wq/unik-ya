@@ -1,6 +1,6 @@
 # ARCHITECTURE — DevMarket (Marketplace Produk Digital & Software Developer)
 
-> Status: Planning / Read-only. Dokumen ini turunan dari `README.md` (PRD v1.0, Sep 2026).
+> Status: Planning / Read-only. Dokumen ini turunan dari `docs/PRD.md` (PRD v1.0, Sep 2026).
 > Aturan: jangan tulis kode aplikasi sebelum dokumen ini disetujui. Perubahan requirement inti wajib diskusi dulu (PRD §83 RULE 1).
 
 ---
@@ -231,5 +231,5 @@ P0 Foundation (auth email+Google, DB+RLS, design system, env/bootstrap) → P1 p
 
 ## 6. Referensi PRD
 
-- PRD lengkap: `README.md` (90 seksi). Sumber binding utama: §4 Non-Goals, §8 Status state machine, §42–§43 stack/arsitektur, §49–§52 auth/RLS/API, §65 URL, §69–§70 security, §78–§79 coding/repo standards, §81–§82 testing/DoD, §83 agent rules, §85 prioritas P0→P2.
+- PRD lengkap: `docs/PRD.md` (90 seksi). Sumber binding utama: §4 Non-Goals, §8 Status state machine, §42–§43 stack/arsitektur, §49–§52 auth/RLS/API, §65 URL, §69–§70 security, §78–§79 coding/repo standards, §81–§82 testing/DoD, §83 agent rules, §85 prioritas P0→P2.
 - Dokumen ini tidak menambah fitur — hanya merumuskan arsitektur + standar + safety rules agar eksekusi berikutnya konsisten.

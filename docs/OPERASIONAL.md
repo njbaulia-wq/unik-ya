@@ -1,6 +1,6 @@
 # Operasional DevMarket (lampiran PRD — bukan requirement baru)
 
-> PRD tetap di `README.md` §1–90. Dokumen ini menjelaskan cara menjalankan,
+> PRD tetap di `docs/PRD.md` §1–90. Dokumen ini menjelaskan cara menjalankan,
 > menguji, dan mendeploy hasil implementasi MVP (T01–T18).
 
 ## 1. Stack + versi exact (dikunci T01)

@@ -1,7 +1,7 @@
 # FIXES — hasil audit vs PRD + ARCHITECTURE.md
 
 > Metode: grep + baca kode per area (fitur §72–77, OWASP, konsistensi
-> error/logging, NON-GOALS §2). PRD (`README.md`) tidak diubah.
+> error/logging, NON-GOALS §2). PRD (`docs/PRD.md`) tidak diubah.
 > Non-goals: tidak satu pun temuan menuntut fitur commerce — tetap patuh.
 >
 > Verifikasi akhir: 78 unit + 6 E2E hijau, typecheck + lint + build lolos.

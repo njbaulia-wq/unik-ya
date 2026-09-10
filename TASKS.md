@@ -1,6 +1,6 @@
 # TASKS — DevMarket MVP (plan only, jangan eksekusi kode)
 
-> Sumber: `README.md` (PRD v1.0) + `ARCHITECTURE.md` (§3–§5 mengikat).
+> Sumber: `docs/PRD.md` (PRD v1.0) + `ARCHITECTURE.md` (§3–§5 mengikat).
 > Status dokumen ini: **plan**. Dilarang menulis kode aplikasi saat menyusun/membaca dokumen ini.
 > Arah dependensi layer: `L1 routes → L2 services → L3 data access → DB`. Shared kernel = `L4`.
 
@@ -326,7 +326,7 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
 - Branch: `agent/quality-gate` | Dep: semua di atas | PRD: §36–41, §61–62, §76–77, §81–82
 - Tujuan: DoD §82 lolos sebelum klaim selesai; bukan sekadar `build`.
 - Layer: **semua (verifikasi akhir)**.
-- File disentuh: `tests/{unit,integration}/*`, `e2e/*.spec.ts` (Playwright: visitor→search→product; developer→create→submit; admin→approve; buyer→contact), `lighthouserc.*`, `README.md` (versi exact Next.js+Node, setup, env, migrasi, seed, admin bootstrap)
+- File disentuh: `tests/{unit,integration}/*`, `e2e/*.spec.ts` (Playwright: visitor→search→product; developer→create→submit; admin→approve; buyer→contact), `lighthouserc.*`, `docs/OPERASIONAL.md` + lampiran `README.md` (versi exact, setup, env, migrasi, seed, admin bootstrap)
 - Terapkan standar di sini:
   - Error: E2E negatif (anon edit, dev-A edit milik-B, non-admin ke admin) harus menghasilkan envelope error yang benar, bukan 500/stack.
   - Logging: audit tidak ada `console.*` lepas; sampling log prod valid JSON + `request-id` end-to-end.
