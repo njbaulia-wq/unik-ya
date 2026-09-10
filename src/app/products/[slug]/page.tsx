@@ -108,9 +108,12 @@ export default async function ProductDetailPage({ params }: Props) {
     ],
   };
 
+  // Escape `<` agar string DB tak bisa breakout dari <script> (XSS).
+  const jsonLdSafe = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
+
   return (
     <main className="container-page py-8">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdSafe }} />
       <nav aria-label="Breadcrumb" className="text-sm text-zinc-600">
         <Link href="/products">Marketplace</Link> / <span aria-current="page">{product.name}</span>
       </nav>
