@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/primitives";
 import type { ProductWithRelations } from "../repository";
@@ -9,13 +10,13 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
   const updated = new Date(product.updated_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
   return (
     <article className="overflow-hidden rounded-lg border border-zinc-200 bg-white transition-colors duration-150 hover:border-zinc-400">
-      <Link href={`/products/${product.slug}`} aria-label={`Lihat ${product.name}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+      <Link href={`/products/${product.slug}`} aria-label={`Lihat ${product.name}`} className="relative block aspect-[16/9] w-full">
+        <Image
           src={coverUrl(cover?.storage_path)}
           alt={cover?.alt_text || `${product.name} — tampilan utama`}
-          loading="lazy"
-          className="aspect-[16/9] w-full object-cover"
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover"
         />
       </Link>
       <div className="p-4">

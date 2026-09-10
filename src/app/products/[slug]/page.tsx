@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
@@ -149,12 +150,16 @@ export default async function ProductDetailPage({ params }: Props) {
             <FavoriteButton productSlug={product.slug} initialSaved={initialSaved} />
           </div>
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={coverUrl(product.product_images?.[0]?.storage_path)}
-            alt={product.product_images?.[0]?.alt_text || `${product.name} — tampilan utama`}
-            className="mt-6 aspect-[16/9] w-full rounded-lg border border-zinc-200 object-cover"
-          />
+          <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-lg border border-zinc-200">
+            <Image
+              src={coverUrl(product.product_images?.[0]?.storage_path)}
+              alt={product.product_images?.[0]?.alt_text || `${product.name} — tampilan utama`}
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 66vw"
+              className="object-cover"
+            />
+          </div>
 
           <section aria-label="Overview" className="mt-8">
             <h2 className="text-lg font-semibold">Overview</h2>
