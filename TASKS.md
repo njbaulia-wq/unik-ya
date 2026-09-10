@@ -318,8 +318,9 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"compare"`, `debug/info` saja; tanpa UI = tanpa log berlebih.
   - Validasi: Zod max 4 slug unik + published-only.
 - Checklist:
-  - [ ] Tidak ada nav/route publik compare; hanya service+test terreview
-  - [ ] Commit di `agent/compare-ready`
+  - [x] Tidak ada nav/route publik compare; hanya service+test terreview
+  - [x] Commit di `agent/compare-ready`
+- Progres T17: compare schema/service + test kontrak URL 2–4 slug, tanpa route/nav publik. QA: 76 test, typecheck, lint lolos.
 
 ### T18 — Quality gate: testing + RLS + SEO/a11y/perf + visual QA
 - Branch: `agent/quality-gate` | Dep: semua di atas | PRD: §36–41, §61–62, §76–77, §81–82
