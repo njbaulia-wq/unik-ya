@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/db";
+import { getEnv } from "@/lib/env";
 import { AppError } from "@/lib/error";
 import { getCategoryPage, resolveCategory } from "@/features/categories/service";
 import { listCategories } from "@/features/products/repository";
@@ -15,6 +16,20 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  try {
+    const supabase = await createServerSupabase();
+    const resolution = await resolveCategory(supabase, slug);
+    if (resolution.kind === "found") {
+      const site = getEnv().NEXT_PUBLIC_SITE_URL;
+      return {
+        title: `${resolution.category.name} — DevMarket`,
+        description: resolution.category.description || `Produk kategori ${resolution.category.name}.`,
+        alternates: { canonical: `${site}/categories/${resolution.category.slug}` },
+      };
+    }
+  } catch {
+    // Fallback di bawah.
+  }
   return { title: `Kategori ${slug} — DevMarket` };
 }
 
