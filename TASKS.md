@@ -70,11 +70,12 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: log migrasi/seed hanya `module:"db"`, level `info`; kegagalan migrasi = `error` + `errorCode:UPSTREAM_ERROR` + `request-id` bila via request.
   - Validasi: constraint DB (enum status, pricing_model, CHECK url `https://`, CHECK jumlah image) sebagai jaring kedua setelah Zod.
 - Checklist:
-  - [ ] Migrasi up/down berurutan, reversible, tidak edit migrasi yang sudah merge
-  - [ ] RLS test allow/deny: anonim tak bisa edit; dev A tak bisa edit milik B; non-admin tak bisa akses admin; service-role tak pernah ke browser
-  - [ ] Slug kategori immutable + tabel `category_redirects` ada
-  - [ ] Tidak ada tabel `orders/payments/transactions/licenses/subscriptions`
-  - [ ] Commit di `agent/db-schema-rls`
+  - [x] Migrasi up/down berurutan, reversible, tidak edit migrasi yang sudah merge
+  - [x] RLS test allow/deny: anonim tak bisa edit; dev A tak bisa edit milik B; non-admin tak bisa akses admin; service-role tak pernah ke browser
+  - [x] Slug kategori immutable + tabel `category_redirects` ada
+  - [x] Tidak ada tabel `orders/payments/transactions/licenses/subscriptions`
+  - [x] Commit di `agent/db-schema-rls`
+- Progres T02: migrasi 0001 (13 tabel + enum + CHECK https/slug/skor) + 0002 (RLS + helper is_admin/own_developer_id) + 0003 (bucket product-images/avatars 2MB/1MB). Guard test statis + unit auth guards. QA: 13 test, typecheck, lint lolos.
 
 ### T03 — Seed fiktif realistis
 - Branch: `agent/seed-data` | Dep: T02 | PRD: §59–60
