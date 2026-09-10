@@ -193,8 +193,9 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"developers|categories|seo"` sesuai area; sitemap hanya log `info` counts.
   - Validasi: Zod slug; robots blokir `/admin /dashboard /api internal`.
 - Checklist:
-  - [ ] Metrik profil hanya products/verified/updated-recently; sitemap hanya public+published; robots benar
-  - [ ] Commit di `agent/profiles-categories-seo`
+  - [x] Metrik profil hanya products/verified/updated-recently; sitemap hanya public+published; robots benar
+  - [x] Commit di `agent/profiles-categories-seo`
+- Progres T09: developers repo/service + kategori resolve/redirect + halaman developers, kategori (301), how-it-works, sitemap dinamis published-only, robots blokir privat. QA: 37 test, typecheck, lint, build lolos.
 
 ---
 

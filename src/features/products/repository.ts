@@ -56,6 +56,22 @@ export async function getProductBySlug(supabase: SupabaseClient, slug: string): 
   return (data ?? null) as unknown as ProductWithRelations | null;
 }
 
+export async function listCategoryProducts(
+  supabase: SupabaseClient,
+  categoryId: string,
+  limit = 24,
+): Promise<ProductWithRelations[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select(SELECT)
+    .eq("status", "published")
+    .eq("category_id", categoryId)
+    .order("published_at", { ascending: false })
+    .limit(limit);
+  if (error) throw toUpstream(error);
+  return (data ?? []) as unknown as ProductWithRelations[];
+}
+
 export async function listSimilarProducts(
   supabase: SupabaseClient,
   opts: { categoryId: string | null; excludeId: string; limit?: number },
