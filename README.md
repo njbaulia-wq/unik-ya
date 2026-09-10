@@ -1,5 +1,6 @@
 # DevMarket — Marketplace Produk Digital & Software Developer
 
+![CI](https://github.com/njbaulia-wq/unik-ya/actions/workflows/ci.yml/badge.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-16.3.4-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres-green)
