@@ -186,6 +186,21 @@ export async function categoryExists(supabase: SupabaseClient, categoryId: strin
   return data !== null;
 }
 
+/** Riwayat versi untuk section Version & Changelog (PRD §15). */
+export async function getProductVersions(
+  supabase: SupabaseClient,
+  productId: string,
+): Promise<{ version: string; changelog: string; created_at: string }[]> {
+  const { data, error } = await supabase
+    .from("product_versions")
+    .select("version,changelog,created_at")
+    .eq("product_id", productId)
+    .order("created_at", { ascending: false })
+    .limit(10);
+  if (error) throw toUpstream(error);
+  return (data ?? []) as unknown as { version: string; changelog: string; created_at: string }[];
+}
+
 /** Ubah status + kolom verifikasi (dipakai submit developer & aksi admin). */
 export async function setProductStatus(
   supabase: SupabaseClient,

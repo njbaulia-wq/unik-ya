@@ -13,6 +13,7 @@ import {
   coverUrl,
   getDeveloperSocials,
   getProductBySlug,
+  getProductVersions,
   listSimilarProducts,
 } from "@/features/products/repository";
 import { VerificationBadges } from "@/features/products/components/VerificationBadges";
@@ -30,11 +31,12 @@ interface Props {
 async function loadSlug(slug: string, requestId?: string) {
   const supabase = await createServerSupabase();
   const product = await getProductDetail(slug, { fetchBySlug: (s) => getProductBySlug(supabase, s) }, { requestId });
-  const [socials, similar] = await Promise.all([
+  const [socials, similar, versions] = await Promise.all([
     getDeveloperSocials(supabase, product.developer_id),
     listSimilarProducts(supabase, { categoryId: product.category_id, excludeId: product.id }),
+    getProductVersions(supabase, product.id),
   ]);
-  return { product, socials, similar };
+  return { product, socials, similar, versions };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -72,7 +74,7 @@ export default async function ProductDetailPage({ params }: Props) {
     throw err;
   }
   if (!loaded) notFound();
-  const { product, socials, similar } = loaded;
+  const { product, socials, similar, versions } = loaded;
   // Best-effort: view tercatat tanpa IP mentah; gagal → halaman tetap jalan.
   let initialSaved = false;
   try {
@@ -181,6 +183,16 @@ export default async function ProductDetailPage({ params }: Props) {
             <p className="mt-2 text-sm text-zinc-600">
               {product.version} · Lisensi: {product.license_type}
             </p>
+            {versions.length > 0 && (
+              <ul className="mt-2 flex flex-col gap-1 text-sm">
+                {versions.map((v) => (
+                  <li key={v.version} className="rounded-lg border border-zinc-200 px-3 py-2">
+                    <strong>{v.version}</strong>
+                    {v.changelog && <span className="text-zinc-600"> — {v.changelog}</span>}
+                  </li>
+                ))}
+              </ul>
+            )}
             {product.documentation_url && (
               <p className="mt-1 text-sm">
                 <a href={product.documentation_url} target="_blank" rel="nofollow noopener" className="underline">
