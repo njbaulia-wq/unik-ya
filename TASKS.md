@@ -272,8 +272,9 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"analytics"`, `info action:"contact_click|demo_click"` (tanpa nilai kontak/email di log) + `request-id`.
   - Validasi: Zod `{ productSlug, channel }`; channel harus salah satu yang enabled; URL tujuan lolos `lib/urls.ts`.
 - Checklist:
-  - [ ] Tanpa internal chat; deep-link WA/email benar; `rel=nofollow noopener` untuk eksternal
-  - [ ] Commit di `agent/contact-flow`
+  - [x] Tanpa internal chat; deep-link WA/email benar; `rel=nofollow noopener` untuk eksternal
+  - [x] Commit di `agent/contact-flow`
+- Progres T14: ratelimit L4, analytics schema/service/repo klik, POST /api/contact-click, ContactFlow modal aksesibel + fire-and-forget tracking, halaman detail pakai modal. QA: 66 test, typecheck, lint, build lolos.
 
 ### T15 — Analytics minimal + KPI
 - Branch: `agent/analytics-kpi` | Dep: T14 | PRD: §27–28, §71, §88
