@@ -113,3 +113,75 @@ export async function getDeveloperSocials(supabase: SupabaseClient, developerId:
   if (error) throw toUpstream(error);
   return (data ?? []) as unknown as DeveloperSocial[];
 }
+
+export interface ProductWriteRow {
+  developer_id: string;
+  category_id: string | null;
+  name: string;
+  slug: string;
+  short_description: string;
+  description: string;
+  product_type: string | null;
+  pricing_model: string;
+  price_text: string | null;
+  demo_url: string | null;
+  documentation_url: string | null;
+  repository_url: string | null;
+  video_url: string | null;
+  tech_stack: string[];
+  features: string[];
+  version: string;
+  license_type: string;
+}
+
+/** Produk milik developer (untuk guard kepemilikan di service). */
+export async function getOwnProduct(
+  supabase: SupabaseClient,
+  productId: string,
+  developerId: string,
+): Promise<ProductWithRelations | null> {
+  const { data, error } = await supabase
+    .from("products")
+    .select(SELECT)
+    .eq("id", productId)
+    .eq("developer_id", developerId)
+    .maybeSingle();
+  if (error) throw toUpstream(error);
+  return (data ?? null) as unknown as ProductWithRelations | null;
+}
+
+export async function insertProduct(supabase: SupabaseClient, row: ProductWriteRow): Promise<string> {
+  const { data, error } = await supabase.from("products").insert(row).select("id").single();
+  if (error) throw toUpstream(error);
+  return (data as unknown as { id: string }).id;
+}
+
+export async function updateProductRow(
+  supabase: SupabaseClient,
+  productId: string,
+  developerId: string,
+  patch: Partial<ProductWriteRow>,
+): Promise<void> {
+  const { error } = await supabase.from("products").update(patch).eq("id", productId).eq("developer_id", developerId);
+  if (error) throw toUpstream(error);
+}
+
+export async function insertProductImage(
+  supabase: SupabaseClient,
+  row: { product_id: string; storage_path: string; alt_text: string; sort_order: number },
+): Promise<void> {
+  const { error } = await supabase.from("product_images").insert(row);
+  if (error) throw toUpstream(error);
+}
+
+export async function countProductImages(supabase: SupabaseClient, productId: string): Promise<number> {
+  const { count, error } = await supabase.from("product_images").select("id", { count: "exact", head: true }).eq("product_id", productId);
+  if (error) throw toUpstream(error);
+  return count ?? 0;
+}
+
+export async function categoryExists(supabase: SupabaseClient, categoryId: string): Promise<boolean> {
+  const { data, error } = await supabase.from("categories").select("id").eq("id", categoryId).maybeSingle();
+  if (error) throw toUpstream(error);
+  return data !== null;
+}

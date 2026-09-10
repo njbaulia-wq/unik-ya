@@ -1,6 +1,8 @@
 import { logger } from "@/lib/logger";
-import { notFound } from "@/lib/error";
-import { slugSchema } from "./schema";
+import { conflict, forbidden, notFound, validationError } from "@/lib/error";
+import { slugifyName } from "@/features/auth/service";
+import { isAllowedVideoUrl } from "@/lib/urls";
+import { slugSchema, productDraftSchema, type ProductDraftInput } from "./schema";
 import type { Category, Developer } from "@/types/database";
 import type { ProductWithRelations } from "./repository";
 
@@ -94,4 +96,110 @@ export function deriveBadges(
   if (nowMs - new Date(product.updated_at).getTime() <= 14 * 86400_000) badges.push("UPDATED");
   if (product.verification_score >= 85) badges.push("POPULAR");
   return badges;
+}
+
+/** Bentuk baris tulis — dipakai create/update draft (status selalu draft di sini). */
+export interface DraftRow {
+  category_id: string | null;
+  name: string;
+  slug: string;
+  short_description: string;
+  description: string;
+  product_type: string | null;
+  pricing_model: string;
+  price_text: string | null;
+  demo_url: string | null;
+  documentation_url: string | null;
+  repository_url: string | null;
+  video_url: string | null;
+  tech_stack: string[];
+  features: string[];
+  version: string;
+  license_type: string;
+}
+
+function toDraftRow(input: ProductDraftInput, developerId: string): DraftRow {
+  return {
+    category_id: input.categoryId ?? null,
+    name: input.name.trim(),
+    slug: slugifyName(input.name.trim()),
+    short_description: input.shortDescription?.trim() ?? "",
+    description: input.description?.trim() ?? "",
+    product_type: input.productType ?? null,
+    pricing_model: input.pricingModel ?? "custom",
+    price_text: input.priceText?.trim() || null,
+    demo_url: input.demoUrl || null,
+    documentation_url: input.documentationUrl || null,
+    repository_url: input.repositoryUrl || null,
+    video_url: input.videoUrl || null,
+    tech_stack: input.techStack ?? [],
+    features: input.features ?? [],
+    version: input.version?.trim() || "0.1.0",
+    license_type: input.licenseType?.trim() || "custom",
+  };
+}
+
+/** L2 create draft — validasi Zod + cek kategori + slug unik per developer. */
+export async function createDraft(
+  developerId: string,
+  raw: unknown,
+  deps: {
+    categoryExists: (id: string) => Promise<boolean>;
+    insert: (row: DraftRow & { developer_id: string }) => Promise<string>;
+  },
+  ctx: { requestId?: string },
+): Promise<{ id: string }> {
+  const parsed = productDraftSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw validationError(parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })));
+  }
+  if (parsed.data.videoUrl && !isAllowedVideoUrl(parsed.data.videoUrl)) {
+    throw validationError([{ field: "videoUrl", message: "Video demo harus URL YouTube https." }]);
+  }
+  if (parsed.data.categoryId) {
+    const exists = await deps.categoryExists(parsed.data.categoryId);
+    if (!exists) throw validationError([{ field: "categoryId", message: "Kategori tidak dikenal." }]);
+  }
+  try {
+    const id = await deps.insert({ ...toDraftRow(parsed.data, developerId), developer_id: developerId });
+    logger.info("Draft produk dibuat.", { module: "products", action: "product_draft_save", requestId: ctx.requestId });
+    return { id };
+  } catch (err) {
+    if (err instanceof Error && /duplicate|unique|conflict/i.test(err.message)) {
+      throw conflict("Nama produk sudah dipakai. Ubah sedikit namanya.");
+    }
+    throw err;
+  }
+}
+
+/** L2 update draft milik sendiri — hanya status draft/submitted yang bisa diubah. */
+export async function updateDraft(
+  developerId: string,
+  product: { id: string; developer_id: string; status: string } | null,
+  raw: unknown,
+  deps: {
+    categoryExists: (id: string) => Promise<boolean>;
+    persist: (id: string, patch: Partial<DraftRow>) => Promise<void>;
+  },
+  ctx: { requestId?: string },
+): Promise<void> {
+  if (!product || product.developer_id !== developerId) throw forbidden("Anda tidak memiliki akses untuk tindakan ini.");
+  if (!["draft", "submitted"].includes(product.status)) {
+    throw conflict("Produk yang sedang/telah published tidak bisa diubah lewat draft.");
+  }
+  const parsed = productDraftSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw validationError(parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })));
+  }
+  if (parsed.data.videoUrl && !isAllowedVideoUrl(parsed.data.videoUrl)) {
+    throw validationError([{ field: "videoUrl", message: "Video demo harus URL YouTube https." }]);
+  }
+  if (parsed.data.categoryId) {
+    const exists = await deps.categoryExists(parsed.data.categoryId);
+    if (!exists) throw validationError([{ field: "categoryId", message: "Kategori tidak dikenal." }]);
+  }
+  const { slug: _slug, ...patch } = toDraftRow(parsed.data, developerId);
+  void _slug;
+  await deps.persist(product.id, patch);
+  logger.info("Draft produk diperbarui.", { module: "products", action: "product_draft_save", requestId: ctx.requestId });
 }

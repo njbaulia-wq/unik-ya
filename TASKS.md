@@ -225,9 +225,10 @@ T13 admin+audit ─→ T14 contact-flow ─→ T15 analytics ─→ T16 favorite
   - Logging: `module:"products"`, `info action:"product_draft_save"` + `durationMs`; upload log tanpa filename mentah PII (sanitized name saja).
   - Validasi: Zod per-step + final; MIME allowlist jpg/png/webp, size, sanitasi filename; video allowlist youtube/youtu.be + https.
 - Checklist:
-  - [ ] Required vs recommended sesuai §21; developer tidak bisa publish langsung (tombol hanya Save draft / Submit)
-  - [ ] Tidak ada binary di Postgres; Storage policy lolos
-  - [ ] Commit di `agent/product-wizard`
+  - [x] Required vs recommended sesuai §21; developer tidak bisa publish langsung (tombol hanya Save draft / Submit)
+  - [x] Tidak ada binary di Postgres; Storage policy lolos
+  - [x] Commit di `agent/product-wizard`
+- Progres T11: urls/files L4, wizard schema draft+submit, repo tulis, service create/update draft, actions + upload, wizard 5 langkah + halaman new/edit. QA: 49 test, typecheck, lint, build lolos.
 
 ### T12 — Submit + state machine + skor verifikasi (deterministik)
 - Branch: `agent/product-lifecycle` | Dep: T11 | PRD: §8, §9–10, §29, §55
