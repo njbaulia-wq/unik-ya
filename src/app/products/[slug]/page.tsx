@@ -14,7 +14,8 @@ import {
   listSimilarProducts,
 } from "@/features/products/repository";
 import { VerificationBadges } from "@/features/products/components/VerificationBadges";
-import { ContactCTA, ContactChannels } from "@/features/products/components/ContactCTA";
+import { ContactChannels } from "@/features/products/components/ContactCTA";
+import { ContactFlow } from "@/features/products/components/ContactModal";
 import { ProductCard } from "@/features/products/components/ProductCard";
 
 interface Props {
@@ -112,7 +113,7 @@ export default async function ProductDetailPage({ params }: Props) {
             {product.verification_status === "verified" && <span> · ✓ Platform Verified</span>}
           </p>
           <div className="mt-4">
-            <ContactCTA demoUrl={product.demo_url} socials={socials} />
+            <ContactFlow demoUrl={product.demo_url} socials={socials} productSlug={product.slug} />
           </div>
 
           {/* eslint-disable-next-line @next/next/no-img-element */}

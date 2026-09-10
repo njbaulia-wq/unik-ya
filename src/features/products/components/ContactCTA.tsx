@@ -23,7 +23,13 @@ export function channelHref(channel: string, value: string): string {
   return value;
 }
 
-export function ContactCTA({ demoUrl, socials }: { demoUrl: string | null; socials: DeveloperSocial[] }) {
+export interface ContactCTAProps {
+  demoUrl: string | null;
+  socials: DeveloperSocial[];
+}
+
+/** Varian tanpa-JS (fallback): tautan langsung. Varian utama: ContactFlow modal. */
+export function ContactCTA({ demoUrl, socials }: ContactCTAProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {demoUrl && (
