@@ -1,5 +1,5 @@
 import { createServerSupabase } from "@/lib/db";
-import { listReviewQueue } from "@/features/admin/repository";
+import { listPublishedForAdmin, listReviewQueue } from "@/features/admin/repository";
 import { moderateAction } from "@/features/admin/actions";
 
 const ACTIONS = [
@@ -13,11 +13,13 @@ const ACTIONS = [
 /** Antrian review — tiap aksi tercatat di audit_logs. */
 export default async function PendingPage() {
   let queue: Awaited<ReturnType<typeof listReviewQueue>> = [];
+  let live: Awaited<ReturnType<typeof listPublishedForAdmin>> = [];
   try {
     const supabase = await createServerSupabase();
-    queue = await listReviewQueue(supabase);
+    [queue, live] = await Promise.all([listReviewQueue(supabase), listPublishedForAdmin(supabase)]);
   } catch {
     queue = [];
+    live = [];
   }
   return (
     <main>
@@ -57,6 +59,51 @@ export default async function PendingPage() {
                 <label>
                   Alasan{" "}
                   <input name="reason" placeholder="wajib untuk tolak/suspend" className="rounded-lg border border-zinc-300 px-2 py-1.5" />
+                </label>
+                <button type="submit" className="rounded-lg bg-zinc-900 px-3 py-1.5 text-white">
+                  Jalankan
+                </button>
+              </form>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <h2 className="mt-10 text-lg font-bold">Produk Published (moderasi pasca-tayang)</h2>
+      {live.length === 0 ? (
+        <p className="mt-2 text-sm text-zinc-600">Belum ada produk published.</p>
+      ) : (
+        <ul className="mt-4 flex flex-col gap-3">
+          {live.map((p) => (
+            <li key={p.id} className="rounded-lg border border-zinc-200 p-4">
+              <p className="font-medium">{p.name}</p>
+              <p className="text-xs text-zinc-500">
+                {p.developers?.display_name} · skor {p.verification_score}
+              </p>
+              <form
+                className="mt-3 flex flex-wrap items-center gap-2 text-sm"
+                action={async (fd: FormData) => {
+                  "use server";
+                  await moderateAction({
+                    productId: String(fd.get("productId")),
+                    action: String(fd.get("action")),
+                    reason: String(fd.get("reason") ?? ""),
+                  });
+                }}
+              >
+                <input type="hidden" name="productId" value={p.id} />
+                <label>
+                  Aksi{" "}
+                  <select name="action" className="rounded-lg border border-zinc-300 px-2 py-1.5">
+                    <option value="suspend">Suspend (wajib alasan)</option>
+                    <option value="archive">Archive</option>
+                    <option value="feature">Feature</option>
+                    <option value="unfeature">Unfeature</option>
+                  </select>
+                </label>
+                <label>
+                  Alasan{" "}
+                  <input name="reason" placeholder="wajib untuk suspend" className="rounded-lg border border-zinc-300 px-2 py-1.5" />
                 </label>
                 <button type="submit" className="rounded-lg bg-zinc-900 px-3 py-1.5 text-white">
                   Jalankan

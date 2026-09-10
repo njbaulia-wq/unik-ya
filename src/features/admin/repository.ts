@@ -15,6 +15,18 @@ export interface PendingProduct {
   developers: { display_name: string; slug: string } | null;
 }
 
+/** L3 — produk published untuk moderasi pasca-tayang (suspend/archive/feature). */
+export async function listPublishedForAdmin(supabase: SupabaseClient, limit = 50): Promise<PendingProduct[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id,name,slug,status,verification_score,updated_at,developers!inner(display_name,slug)")
+    .eq("status", "published")
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+  if (error) throw toUpstream(error);
+  return (data ?? []) as unknown as PendingProduct[];
+}
+
 /** L3 admin — antrian review + tulis audit + aksi kurasi. */
 export async function listReviewQueue(supabase: SupabaseClient): Promise<PendingProduct[]> {
   const { data, error } = await supabase
